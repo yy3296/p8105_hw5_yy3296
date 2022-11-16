@@ -71,5 +71,16 @@ homecide_raw = read_csv("./data/homicide-data.csv")
 * Description
   * There are `r nrow(homecide_raw)` observations in the raw data.
   * There are `r ncol(homecide_raw)` variables in the raw data, which are `r colnames(homecide_raw)`.
+
+I Create a city_state variable and then summarize within cities to obtain the total number of homicides and the number of unsolved homicides (those for which the disposition is “Closed without arrest” or “Open/No arrest”).
+```{r}
+summarize_homecide = 
+  homecide_raw %>%
+  janitor::clean_names() %>%
+  mutate(city_state = str_c(city, ",", state)) %>%
+  group_by(city) %>% 
+  summarize(number_homecide = n(),
+            unsolve_homecide = sum(disposition == "Closed without arrest" | disposition == "Open/No arrest"))
   
+```
 
