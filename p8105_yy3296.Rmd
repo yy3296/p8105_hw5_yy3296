@@ -79,7 +79,7 @@ summarize_homecide =
   homecide_raw %>%
   janitor::clean_names() %>%
   mutate(city_state = str_c(city, ",", state)) %>%
-  group_by(city) %>% 
+  group_by(city_state) %>% 
   summarize(number_homecide = n(),
             unsolve_homecide = sum(disposition == "Closed without arrest" | disposition == "Open/No arrest"))
 ```
@@ -89,11 +89,22 @@ I use the prop.test function to estimate the proportion of homicides that are un
 ```{r}
 Baltimore = 
   summarize_homecide %>%
-  filter(city == "Baltimore")
+  filter(city_state == "Baltimore,MD")
 prop_Baltimore = prop.test(Baltimore$unsolve_homecide, Baltimore$number_homecide) %>%
   broom::tidy()
 ```
 * For the city of Baltimore, MD, the estimated proportion of homicides that are unsolved is `r prop_Baltimore[['estimate']]`.
 * The confidence interval is (`r prop_Baltimore[['conf.low']]`, `r prop_Baltimore[['conf.high']]`)
 
+I run prop.test for each of the cities in the dataset, and extract both the proportion of unsolved homicides and the confidence interval for each. I Do this within a “tidy” pipeline, making use of purrr::map, purrr::map2, list columns and unnest to create a tidy dataframe with estimated proportions and CIs for each city.
 
+```{r}
+prop_allcities = 
+  summarize_homecide %>% 
+  mutate(
+    prop_eachcity = map2(.x = unsolve_homecide, .y = number_homecide, ~prop.test(x = .x, n = .y)),
+    tidy_prop_eachcity = map(.x = prop_eachcity, ~broom::tidy(.x))
+    ) %>%
+  unnest(tidy_prop_eachcity) %>% 
+  select(city_state, estimate, conf.low, conf.high)
+```
