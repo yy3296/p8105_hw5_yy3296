@@ -108,3 +108,19 @@ prop_allcities =
   unnest(tidy_prop_eachcity) %>% 
   select(city_state, estimate, conf.low, conf.high)
 ```
+
+I create a plot that shows the estimates and CIs for each city and organize cities according to the proportion of unsolved homicides.
+
+```{r}
+prop_allcities %>% 
+  mutate(city_state = fct_reorder(city_state, estimate)) %>% 
+  ggplot(aes(x = city_state, y = estimate)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(
+    title = 'The Estimates And CIs For Each City',
+    x = 'Each City_State',
+    y = 'Estimates and CIs')
+```
+
