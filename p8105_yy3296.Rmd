@@ -7,6 +7,7 @@ output: github_document
 
 ```{r}
 library(tidyverse)
+library(readr)
 ```
 
 ## Problem 1
@@ -58,4 +59,17 @@ tidy_df %>%
   geom_path() + 
   facet_grid(~group)
 ```
+
+## Problem 2
+
+I import the data
+
+```{r}
+homecide_raw = read_csv("./data/homicide-data.csv")
+```
+
+* Description
+  * There are `r nrow(homecide_raw)` observations in the raw data.
+  * There are `r ncol(homecide_raw)` variables in the raw data, which are `r colnames(homecide_raw)`.
+  
 
