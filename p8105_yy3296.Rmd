@@ -166,7 +166,21 @@ When mu=0, I iter for 5000 times and get the estimate and p value.
 sim_results_df_0 = 
   expand_grid(
     mu = 0, 
-    iter = 1:50
+    iter = 1:5000
+  ) %>% 
+  mutate(
+    estimate_df = map(.x = mu, ~t_tests(mu = .x))
+  ) %>% 
+  unnest(estimate_df)
+```
+
+When mu=0~6, I iter for 5000 times and get the estimate and p value.
+
+```{r}
+sim_results_df = 
+  expand_grid(
+    mu = 0:6, 
+    iter = 1:5000
   ) %>% 
   mutate(
     estimate_df = map(.x = mu, ~t_tests(mu = .x))
